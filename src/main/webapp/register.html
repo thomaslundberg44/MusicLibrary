@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Music Library login</title>
+
+	<link rel="stylesheet" type="text/css" href="css/formStyle.css">
+	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
+	<script type="text/javascript" src="media/js/jquery.min.js"></script>
+	<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#register").submit(function() {
+				var pwd1 = $("#pwd1")[0].value;
+				var pwd2 = $("#pwd2")[0].value;
+				// var pwd2 = document.getElementById("pwd2").value;
+				// alert("password 1: "+pwd1);
+				if(pwd1 != pwd2) {
+					alert("Passwords must be the same!");
+				}else {
+					alert("Should be ok");
+				}
+			});
+		});
+	</script>
+
+</head>
+<body>
+
+	<div id="wrapper">
+		<br>
+		<br>
+		<div class="container" id="login-form">
+			<div id="logo" align="center">
+				<img id='imgLogo' src="images/android_eat_apple_logo.png" alt="Logo">
+			</div>
+			<h2 align="center">Register</h2>
+			<form class="form-horizontal" role="form" id="register">
+				<div class="form-group">
+					<label class="control-label col-sm-2" for="username">Username:</label>
+					<div class="col-sm-10">
+						<input type="username" class="form-control" id="uname" placeholder="Enter username">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-sm-2" for="username">Name:</label>
+					<div class="col-sm-10">
+						<input type="name" class="form-control" id="name" placeholder="Enter name">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-sm-2" for="pwd">Password:</label>
+					<div class="col-sm-10">
+						<input type="password" class="form-control" id="pwd1" placeholder="Enter password">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-sm-2" for="pwd">Re-enter Password:</label>
+					<div class="col-sm-10">
+						<input type="password" class="form-control" id="pwd2" placeholder="Re-enter password">
+					</div>
+				</div>
+				<!-- <div class="form-group">
+					<label class="control-label col-sm-2">Choose File</label>
+					<div class="col-sm-10">
+						<input id="formInput" type="file" name="uploadedFile" size="50" accept=".xml" />
+					</div>
+				</div> -->
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<button type="submit" class="btn btn-primary btn-block">Register</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</body>
+</html>

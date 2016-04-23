@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Upload Excel Spreadsheet</title>
+<link rel="stylesheet" type="text/css" href="css/style.css"></link>
+<script type="text/javascript" src="media/js/jquery.js"></script>
+
+</head>
+<body class="indexPage">
+	
+	<br />
+	<br />
+	<br />
+	
+	<div id="uploadForm" class="login-card">
+		<div align="center">
+			<img id='img' src="Ericsson_logo.png" alt="EricssonLogo"
+				style="width: 155px; height: 140px;">
+		</div>
+		<form action="rest/uploadXML/import" method="post"
+			enctype="multipart/form-data">
+
+			<p>
+				<h4 align="center">Choose a file to upload:</h4><br /><br /> 
+				<input id="formInput" type="file" name="uploadedFile" size="50"/>
+					<!-- accept=".xml" /> -->
+			</p>
+
+			<input id="uploadButton" type="submit" value="Upload It" class="login login-submit"/>
+		</form>
+	</div>
+
+</body>
+</html>
