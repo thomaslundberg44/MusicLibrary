@@ -16,5 +16,4 @@ public interface PlaylistDAO {
 	public Collection<Playlist> getPlaylistsForLib(String libPersistentId);
 	public Collection<Playlist> getTracksForPlaylist(String playlistName);
 	public Response deletePlaylist(int playlistId);
-	public Response deleteTrackFromPlaylist(String playlistName, int trackId);
 }

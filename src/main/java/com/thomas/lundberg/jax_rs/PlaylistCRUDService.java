@@ -76,21 +76,4 @@ public class PlaylistCRUDService {
 		return playlistService.deletePlaylist(playlistId);
 	}
 	
-	@DELETE
-	@Path("/deleteTrackFromPlaylist")
-	@Consumes(MediaType.APPLICATION_JSON) 
-	public Response deleteTrackFromPlaylist(String json) {
-		JSONParser parser = new JSONParser();
-		try {
-			Object obj = parser.parse(json);
-			JSONObject jsonObject = (JSONObject)obj;
-			String playlistName = (String) jsonObject.get("playlistId");
-			int trackId = Integer.parseInt((String) jsonObject.get("trackId"));
-			playlistService.deleteTrackFromPlaylist(playlistName, trackId);
-			return Response.ok().build();
-		} catch (ParseException e) {
-			System.out.println("Parse Exception: Error parsing user JSON object");
-			return Response.status(404).build();
-		}
-	}
 }

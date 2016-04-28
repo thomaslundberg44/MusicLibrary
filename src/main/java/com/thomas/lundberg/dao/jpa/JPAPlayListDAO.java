@@ -101,19 +101,4 @@ public class JPAPlayListDAO implements PlaylistDAO {
 			}
 		}
 	}
-	
-	public Response deleteTrackFromPlaylist(String playlistId, int trackId) {
-		Track track = em.find(Track.class, trackId);
-//		Collection<Playlist> trackPlaylists = track.getPlaylists();
-//		trackPlaylists.remove(track);
-//		em.merge(trackPlaylists);
-//		if(trackPlaylists.size() == 0) {
-//			System.out.println("Removing track: ID: "+track.getId());
-//			em.remove(track);
-//		}else {
-//			System.out.println("Not removing. size: "+trackPlaylists.size());
-//		}
-		return Response.ok().build();
-	}
-
 }

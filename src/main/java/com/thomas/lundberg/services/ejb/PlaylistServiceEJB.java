@@ -49,8 +49,4 @@ public class PlaylistServiceEJB implements PlaylistService {
 		return playlistDAO.deletePlaylist(playlistId);
 	}
 
-	public Response deleteTrackFromPlaylist(String playlistName, int trackId) {
-		return playlistDAO.deleteTrackFromPlaylist(playlistName, trackId);
-	}
-
 }
