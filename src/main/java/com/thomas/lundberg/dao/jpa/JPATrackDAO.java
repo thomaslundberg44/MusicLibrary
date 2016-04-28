@@ -89,7 +89,6 @@ public class JPATrackDAO implements TrackDAO {
 		if(track != null) {
 			System.out.println("Track is on "+track.getPlaylists().size()+" playlists");
 			Playlist oldPlaylist = null, newPlaylist = null;
-//			Collection<Playlist> playlists = track.getPlaylists();
 			Query query = em.createQuery("From Playlist");
 			@SuppressWarnings("unchecked")
 			List<Playlist> playlists = query.getResultList();
