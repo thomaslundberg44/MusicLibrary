@@ -79,7 +79,6 @@
 
             $('#btnDeleteLibrary').click( function () {
             	var libPersistentId = selectedCell.html();
-                alert("Deleting Library: "+libPersistentId);
                 $('#myTable').DataTable().row('.selected').remove().draw( false );
                 document.getElementById('btnDeleteLibrary').style.visibility = "hidden";
                 $.ajax({
@@ -88,7 +87,7 @@
                 	url : "rest/libraries/deleteLib",
                 	data : libPersistentId,
                 	success : function(data) {
-                		alert("Boom"+data);
+                		alert("Deleted Library: "+libPersistentId);
                 	},
                 	contentType : "text/plain"
                 });

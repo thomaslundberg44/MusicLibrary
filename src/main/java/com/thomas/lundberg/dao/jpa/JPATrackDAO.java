@@ -1,6 +1,5 @@
 package com.thomas.lundberg.dao.jpa;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -52,11 +51,6 @@ public class JPATrackDAO implements TrackDAO {
 		return query.getResultList();
 	}
 
-//	public Collection<Track> getTracksForPlaylist(String playlistName) {
-////		Query query = em.createQuery("From Track t Where t.playlist)
-//		return null;
-//	}
-
 	public Response deleteTrack(int trackId, String playlistName) {
 		Track track = em.find(Track.class, trackId);
 		if(track != null) {
@@ -86,6 +80,42 @@ public class JPATrackDAO implements TrackDAO {
 			System.out.println("Track is null");
 			return Response.status(404).build();
 		}
+	}
+
+	public Response moveTrack(int trackId, String oldPlaylistStr, String newPlaylistStr) {
+		System.out.println("In Move Track method, trackId: "
+				+trackId+", old playlist: "+oldPlaylistStr+", new Playlist: "+newPlaylistStr);
+		Track track = em.find(Track.class, trackId);
+		if(track != null) {
+			System.out.println("Track is on "+track.getPlaylists().size()+" playlists");
+			Playlist oldPlaylist = null, newPlaylist = null;
+//			Collection<Playlist> playlists = track.getPlaylists();
+			Query query = em.createQuery("From Playlist");
+			@SuppressWarnings("unchecked")
+			List<Playlist> playlists = query.getResultList();
+			for(Playlist playlistItem : playlists) {
+				if(playlistItem.getName().equals(oldPlaylistStr))
+					oldPlaylist = playlistItem;
+				else if(playlistItem.getName().equals(newPlaylistStr))
+					newPlaylist = playlistItem;
+			}
+			if(oldPlaylist != null && newPlaylist != null) {
+				System.out.println("Removing association of playlist id: "+oldPlaylist.getPlayListId());
+				track.getPlaylists().remove(oldPlaylist);
+				oldPlaylist.getTracks().remove(track);
+				
+				if(!newPlaylist.getTracks().contains(track)) {
+					track.getPlaylists().add(newPlaylist);
+					newPlaylist.getTracks().add(track);
+				}
+				
+				em.merge(track);
+			}else 
+				System.out.println("oldPlaylist is null: "+(oldPlaylist == null)+", newPlaylist is null: "+(newPlaylist == null));
+			return Response.ok().build();
+		}
+		else
+			return Response.status(404).build();
 	}
 
 }

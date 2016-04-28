@@ -41,4 +41,8 @@ public class TrackServiceEJB implements TrackService {
 		return trackDAO.deleteTrack(trackId, playlistName);
 	}
 
+	public Response moveTrack(int trackId, String oldPlaylist, String newPlaylist) {
+		return trackDAO.moveTrack(trackId, oldPlaylist, newPlaylist);
+	}
+
 }

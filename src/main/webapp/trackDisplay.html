@@ -23,6 +23,8 @@
 
         var selectedLibrary = "";
         var selectedPlaylist = "";
+        var selectedMovePlaylist = "";
+        var selectedTrackId;
 
         $(document).ready(function() {
             populateLibDropDownList();
@@ -149,7 +151,10 @@
                     table.$('tr.selected').removeClass('selected');
                     $(this).addClass('selected');
                     document.getElementById('btnDeleteTrack').style.visibility = "visible";
+                    document.getElementById("moveTrackForm").style.visibility = "visible";
+                    populateMoveTrackToPlaylistDropDownList(selectedLibrary);  
                     selectedCell = $(this).find("td").eq(0);
+                    selectedTrackId = selectedCell.html();
                 }
             } );
 
@@ -159,21 +164,80 @@
                     "trackId" : trackId,
                     "playlistName" : selectedPlaylist
                 }
-                alert("Deleting track: "+selectedCell.html());
                 $('#myTable').DataTable().row('.selected').remove().draw( false );
                 document.getElementById('btnDeleteTrack').style.visibility = "hidden";
+                document.getElementById("moveTrackForm").style.visibility = "hidden";
                 $.ajax({
                     async : false,
                     type : "DELETE",
                     url : "rest/tracks/deleteTrack",
                     data : JSON.stringify(json),
                     success : function(data) {
-                        alert("Boom"+data);
+                        alert("Deleted Track: "+trackId);
                         selectedCell = null;
                     },
                     contentType : "application/json"
                 });
             } );
+        }
+
+        function populateMoveTrackToPlaylistDropDownList(libPersistentId) {
+            var library = { "libPersistentId" : libPersistentId }
+            $.ajax({
+                async : false,
+                type : "POST",
+                url : "rest/playlists/getPlaylistsForLib",
+                data : JSON.stringify(library),
+                success : function(jdata) {
+                    var rows = 0;
+                    $.each(jdata, function(index, value) {
+                        $.each(value, function (key, val) {
+                            $("#moveTrackDropdownList").append( '<li><a href="#">' + val[1] + '</a></li>' );
+                            rows++;
+                        });
+                    });
+                    if(rows == 0)
+                        $("#moveTrackDropdownList").append( '<li><a href="#">No Playlists to display</a></li>' );
+
+                    setMoveTrackPlaylistDropDownClicker();
+                },
+                contentType : "application/json"
+            });
+        }
+        
+        function setMoveTrackPlaylistDropDownClicker() {
+            $('#moveTrackDropdownList li > a').click(function(e){
+                $('#btnDropDown3').text(this.innerHTML);
+                selectedMovePlaylist = this.innerHTML;
+            });
+        }
+
+        function moveTrack() {
+            alert("Moving track: "+selectedCell.html());
+            // selectedCell = null;
+            if(selectedLibrary == "")
+                alert("Please select a Playlist from drop down menus");
+            else {
+                // move track
+                var json = {
+                    "oldPlaylist" : selectedPlaylist,
+                    "newPlaylist" : selectedMovePlaylist,
+                    "trackId" : selectedCell.html()
+                }
+                $('#myTable').DataTable().row('.selected').remove().draw( false );
+                document.getElementById('btnDeleteTrack').style.visibility = "hidden";
+                document.getElementById("moveTrackForm").style.visibility = "hidden";
+                $.ajax({
+                    async : false,
+                    type : "POST",
+                    url : "rest/tracks/moveTrack",
+                    data : JSON.stringify(json),
+                    success : function(data) {
+                        alert("Moved Track from "+selectedPlaylist+" to "+selectedMovePlaylist);
+                    },
+                    contentType : "application/json"
+                });
+            }
         }
 
         var selectedCell;
@@ -204,6 +268,21 @@
             <button type="submit" class="btn btn-success" onclick="addPlaylistsToTable()">Display Tracks from this Playlist</button>
         </form>
 
+        
+        <form class="form-inline" id="moveTrackForm" role="form" style="visibility:hidden">
+            <h2>Move Track to another Playlist</h2>
+            <div class="form-group dropdown">
+                <label for="email">Playlists:</label>
+                <button class="btn btn-primary dropdown-toggle" id="btnDropDown3" type="button" data-toggle="dropdown">Select Playlist
+                <span class="caret"></span></button>
+                <ul class="dropdown-menu" id="moveTrackDropdownList">
+                    <!-- items added dynamically on page load -->
+                </ul>
+            </div>
+            <button type="submit" class="btn btn-success" onclick="moveTrack()">Move Track to this Playlist</button>
+
+        </form>
+        
         <button class="btn btn-primary pull-right" id="btnDeleteTrack" style="visibility:hidden">Delete Selected Track</button>
 
         <div id="tablePane">

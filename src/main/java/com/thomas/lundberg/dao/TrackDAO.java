@@ -14,4 +14,5 @@ public interface TrackDAO {
 	public Track getTrack(int trackId);
 	public Collection<Track> getAllTracks();
 	public Response deleteTrack(int trackId, String playlistName);
+	public Response moveTrack(int trackId, String oldPlaylist, String newPlaylist);
 }
