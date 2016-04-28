@@ -23,15 +23,19 @@
 					url : "rest/users/login",
 					data : JSON.stringify(user),
 					success : function(data) {
-						if(data == "Success") {
-							window.location.assign("http://localhost:8080/MusicLibrary/uploadXML.html");
+						if(data.indexOf("username") >= 0) {
+							var userDetails = JSON.parse(data);
+							window.sessionStorage.setItem("userId", userDetails.userId);
+							window.sessionStorage.setItem("loggedIn", true);
+							window.sessionStorage.setItem("name", userDetails.name);
+							window.location.assign("http://localhost:8080/MusicLibrary/userProfile.html");
 						} else {
 							alert(data);
 						}
 					},
 					contentType : "application/json"
 				});
-			return false;
+				return false;
 			});
 		});
 

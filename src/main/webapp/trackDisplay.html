@@ -1,0 +1,237 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>User Profile</title>
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/profileStyle.css">
+    <script type="text/javascript" src="media/js/jquery.min.js"></script>
+	<script type="text/javascript" src="media/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript">
+		var isLoggedIn = false;
+        isLoggedIn = window.sessionStorage.getItem("loggedIn");
+
+        var username = window.sessionStorage.getItem("username");
+        var userId = parseInt(window.sessionStorage.getItem("userId"));
+        
+        if(!isLoggedIn) {
+            window.location.assign("http://localhost:8080/MusicLibrary");
+        }
+
+        var selectedLibrary = "";
+        var selectedPlaylist = "";
+
+        $(document).ready(function() {
+            populateLibDropDownList();
+        });
+
+        function populateLibDropDownList() {
+            $.ajax({
+                async : false,
+                type : "POST",
+                url : "rest/libraries/getLibsForUser",
+                data : JSON.stringify(userId),
+                success : function(jdata) {
+                    var rows = 0;
+                    $.each(jdata, function(index, value) {
+                        $.each(value, function (key, val) {
+                            $("#libDropdownList").append( '<li><a href="#">' + val[0] + '</a></li>' );
+                            rows++;
+                        });
+                    });
+                    if(rows == 0)
+                        $("#libDropdownList").append( '<li><a href="#">No Libraries to display</a></li>' );
+                            
+                    setDropDownClicker();
+                },
+                contentType : "application/json"
+            });
+        }
+
+        function populatePlaylistDropDownList(libPersistentId) {
+            var library = { "libPersistentId" : libPersistentId }
+            $.ajax({
+                async : false,
+                type : "POST",
+                url : "rest/playlists/getPlaylistsForLib",
+                data : JSON.stringify(library),
+                success : function(jdata) {
+                    var rows = 0;
+                    $.each(jdata, function(index, value) {
+                        $.each(value, function (key, val) {
+                            $("#playlistDropdownList").append( '<li><a href="#">' + val[1] + '</a></li>' );
+                            rows++;
+                        });
+                    });
+                    if(rows == 0)
+                        $("#playlistDropdownList").append( '<li><a href="#">No Playlists to display</a></li>' );
+
+                    setPlaylistDropDownClicker();
+                },
+                contentType : "application/json"
+            });
+        }
+
+        function setDropDownClicker() {
+            $('#libDropdownList li > a').click(function(e){
+                $('#btnDropDown').text(this.innerHTML);
+                populatePlaylistDropDownList(this.innerHTML);
+                selectedLibrary = this.innerHTML;
+            });
+        }
+
+        function setPlaylistDropDownClicker() {
+            $('#playlistDropdownList li > a').click(function(e){
+                $('#btnDropDown2').text(this.innerHTML);
+                selectedPlaylist = this.innerHTML;
+            });
+        }
+
+        function addPlaylistsToTable() {
+            selectedCell = null;
+            if(selectedLibrary == "")
+                alert("Please select a Library and Playlist from drop down menus");
+            else if(selectedPlaylist == "")
+                alert("Please choose a Playlist from drop down menu");
+            else if((selectedPlaylist == "No Playlists to display")) //|| (selectedLibrary = "No Libraries to display"))
+                alert("Sorry you do not have any Playlists to display");
+            else
+                populateTrackTable();
+        }
+
+        function populateTrackTable() {
+            var playlist = { "playlistName" : selectedPlaylist }
+            $.ajax({
+                async : false,
+                type : "POST",
+                url : "rest/playlists/getTracksForPlaylist",
+                data : JSON.stringify(playlist),
+                success : function(data) {
+                    $('#myTable').DataTable().destroy();
+                    var table = $("#myTable").dataTable({
+                        data: getTableArray(data),
+                        columns: [
+                            { title: "Track ID" },
+                            { title: "Title"},
+                            { title: "Artist"},
+                            { title: "Album"},
+                            { title: "Genre"},
+                            { title: "Track Persistent ID"}
+                        ]
+                    });
+                    document.getElementById("tablePane").style.visibility = "visible";
+                    setTableSelector(table);
+                },
+                contentType : "application/json"
+            });
+        }
+
+        function getTableArray(jdata) {
+            var array = [];
+            $.each(jdata, function(index, value) {
+                $.each(value, function (key, val) {
+                    array.push([val.id, val.title, val.artist, val.album, val.genre, val.persistentId]);
+                });
+            });
+            return array;
+        }
+
+        function setTableSelector(table) {
+            $('#myTable tbody').on( 'click', 'tr', function () {
+                if ( $(this).hasClass('selected') ) {
+                    $(this).removeClass('selected');
+                    document.getElementById('btnDeleteTrack').style.visibility = "hidden";
+                }
+                else {
+                    table.$('tr.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                    document.getElementById('btnDeleteTrack').style.visibility = "visible";
+                    selectedCell = $(this).find("td").eq(0);
+                }
+            } );
+
+            $('#btnDeleteTrack').click( function () {
+                var trackId = selectedCell.html();
+                var json = {
+                    "trackId" : trackId,
+                    "playlistName" : selectedPlaylist
+                }
+                alert("Deleting track: "+selectedCell.html());
+                $('#myTable').DataTable().row('.selected').remove().draw( false );
+                document.getElementById('btnDeleteTrack').style.visibility = "hidden";
+                $.ajax({
+                    async : false,
+                    type : "DELETE",
+                    url : "rest/tracks/deleteTrack",
+                    data : JSON.stringify(json),
+                    success : function(data) {
+                        alert("Boom"+data);
+                        selectedCell = null;
+                    },
+                    contentType : "application/json"
+                });
+            } );
+        }
+
+        var selectedCell;
+
+	</script>
+</head>
+<body>
+
+    <div class="container" id="profile-inset-form">
+        <h2>Choose Library and Playlist to display tracks from</h2>
+        <form class="form-inline" role="form">
+            <div class="form-group dropdown">
+                <label for="email">Libraries:</label>
+                <button class="btn btn-primary dropdown-toggle" id="btnDropDown" type="button" data-toggle="dropdown">Select Library
+                <span class="caret"></span></button>
+                <ul class="dropdown-menu" id="libDropdownList">
+                    <!-- items added dynamically on page load -->
+                </ul>
+            </div>
+            <div class="form-group dropdown">
+                <label for="email">Playlists:</label>
+                <button class="btn btn-primary dropdown-toggle" id="btnDropDown2" type="button" data-toggle="dropdown">Select Playlist
+                <span class="caret"></span></button>
+                <ul class="dropdown-menu" id="playlistDropdownList">
+                    <!-- items added dynamically on page load -->
+                </ul>
+            </div>
+            <button type="submit" class="btn btn-success" onclick="addPlaylistsToTable()">Display Tracks from this Playlist</button>
+        </form>
+
+        <button class="btn btn-primary pull-right" id="btnDeleteTrack" style="visibility:hidden">Delete Selected Track</button>
+
+        <div id="tablePane">
+            <h2>Your Tracks</h2>
+            <table id="myTable" class="display" width="100%" cellspacing="0" >
+                <thead>
+                    <tr>
+                        <th>Track ID</th>
+                        <th>Title</th>
+                        <th>Artist</th>
+                        <th>Album</th>
+                        <th>Genre</th>
+                        <th>Track Persistent ID</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Track ID</th>
+                        <th>Title</th>
+                        <th>Artist</th>
+                        <th>Album</th>
+                        <th>Genre</th>
+                        <th>Track Persistent ID</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

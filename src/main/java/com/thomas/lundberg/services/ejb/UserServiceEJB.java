@@ -19,7 +19,7 @@ public class UserServiceEJB implements UserService {
 	
 	@Inject private UserDAO userDAO;
 
-	public boolean addUser(User user) {
+	public String addUser(User user) {
 		return userDAO.addUser(user);
 	}
 
@@ -35,9 +35,12 @@ public class UserServiceEJB implements UserService {
 		return userDAO.getAllUsers();
 	}
 
-	@Override
 	public String verifyUser(String uname, String pass) {
 		return userDAO.verifyUser(uname, pass);
+	}
+
+	public String updateUser(User user) {
+		return userDAO.updateUser(user);
 	}
 
 }

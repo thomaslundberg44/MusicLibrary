@@ -35,7 +35,7 @@ public class Playlist implements Serializable {
 	@JoinColumn(name="libraryPersistentId", referencedColumnName="libraryPersistentId", nullable=false)
 	private Library library;
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.LAZY, cascade={CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(name="Playlists_Tracks",
 			joinColumns = {
 				@JoinColumn(name = "playlistId", nullable=false, updatable = false)
@@ -44,6 +44,7 @@ public class Playlist implements Serializable {
 				@JoinColumn(name = "trackId", nullable = false, updatable = false)
 			}
 	)
+	@JsonIgnore
 	private Set<Track> tracks = new HashSet<Track>();
 	
 	
@@ -91,10 +92,11 @@ public class Playlist implements Serializable {
 		this.library = library;
 	}
 
+	@JsonIgnore
 	public Set<Track> getTracks() {
 		return tracks;
 	}
-
+	
 	public void setTracks(Set<Track> tracks) {
 		this.tracks = tracks;
 	}

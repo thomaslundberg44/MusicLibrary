@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -30,7 +31,8 @@ public class Track implements Serializable {
 	@Column(name="genre") private String genre;
 	@Column(name="trackPersistentId") private String persistentId; 
 
-	@ManyToMany(fetch = FetchType.LAZY, mappedBy="tracks")
+	@ManyToMany(cascade={CascadeType.PERSIST, CascadeType.MERGE}, 
+			fetch = FetchType.LAZY, mappedBy="tracks")
 	private Set<Playlist> playlists = new HashSet<Playlist>();
 	
 	public Track() {}
@@ -94,16 +96,16 @@ public class Track implements Serializable {
 		this.persistentId = persistentId;
 	}
 
-//	@JsonIgnore
-//	public Collection<Playlist> getPlaylists() {
-//		return playlists;
-//	}
-//
-//	public void setPlaylist(Set<Playlist> playlists) {
-//		this.playlists = playlists;
-//	}
-//	
-//	public void addPlaylist(Playlist playlist) {
-//		playlists.add(playlist);
-//	}
+	@JsonIgnore
+	public Collection<Playlist> getPlaylists() {
+		return playlists;
+	}
+	
+	public void setPlaylist(Set<Playlist> playlists) {
+		this.playlists = playlists;
+	}
+	
+	public void addPlaylist(Playlist playlist) {
+		playlists.add(playlist);
+	}
 }

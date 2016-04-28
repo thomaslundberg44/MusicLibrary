@@ -35,7 +35,7 @@ public class Library implements Serializable {
 	@JsonIgnore
 	private User user;
 	
-	@OneToMany(mappedBy="library", fetch = FetchType.EAGER, cascade={CascadeType.MERGE, CascadeType.PERSIST})
+	@OneToMany(mappedBy="library", fetch = FetchType.LAZY, cascade=CascadeType.ALL)
 	private Collection<Playlist> playlists = new ArrayList<Playlist>();
 
 	public Library() {}
@@ -71,6 +71,7 @@ public class Library implements Serializable {
 		this.user = user;
 	}
 
+	@JsonIgnore
 	public Collection<Playlist> getPlaylists() {
 		return playlists;
 	}

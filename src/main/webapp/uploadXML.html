@@ -10,6 +10,30 @@
 	<script type="text/javascript" src="media/js/jquery.min.js"></script>
 	<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
 
+	<script type="text/javascript">
+
+		var isLoggedIn = false;
+        isLoggedIn = window.sessionStorage.getItem("loggedIn");
+
+        var userId = parseInt(window.sessionStorage.getItem("userId"));
+        
+        if(!isLoggedIn) {
+            window.location.assign("http://localhost:8080/MusicLibrary");
+        }
+
+        function setUserId() {
+        	$.ajax({
+        		async : false,
+        		type : "POST",
+        		url : "rest/uploadXML/setUserId",
+        		data : JSON.stringify(userId),
+        		contentType : "application/json"
+        	});
+        }
+        setUserId();
+
+	</script>
+
 </head>
 <body class="indexPage">
 

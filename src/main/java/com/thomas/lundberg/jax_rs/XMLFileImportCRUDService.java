@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -26,7 +27,16 @@ public class XMLFileImportCRUDService {
 	
 	@Inject private ProcessXMLPlistJaxB processXML;
 
-	private int userId = 1;
+	private static int userId;
+	
+	@POST
+	@Path("/setUserId")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public void setUserId(String userIdJson) {
+		int userId = Integer.parseInt(userIdJson);
+		System.out.println("Setting ID: "+userId);
+		ProcessXMLPlistJaxB.setUserId(userId);
+	}
 	
 	@POST
 	@Path("/import")

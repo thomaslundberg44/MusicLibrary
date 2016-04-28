@@ -39,7 +39,7 @@ public class ProcessXMLPlistJaxB {
 	
 	@PersistenceContext private EntityManager em;
 	
-	private int userId;
+	private static int userId;
 	
 	private Library library;
 	private Collection<Playlist> playlists;
@@ -55,13 +55,17 @@ public class ProcessXMLPlistJaxB {
 	}
 	
 	public void processXMLFile(File file, int userId) {
-		this.userId = userId;
+//		this.userId = userId;
 		long start = System.currentTimeMillis();
 		process(file);
 		long end = System.currentTimeMillis();
 		System.out.println("File processed. Took "+(end-start)/1000.0+" seconds");
 		
 //		printTestOutput();
+	}
+	
+	public static void setUserId(int id) {
+		userId = id;
 	}
 	
 	private void printTestOutput() {

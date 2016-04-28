@@ -11,6 +11,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.json.simple.JSONObject;
+
 import com.thomas.lundberg.dao.UserDAO;
 import com.thomas.lundberg.entities.User;
 
@@ -22,15 +24,16 @@ public class JPAUserDAO implements UserDAO {
 	@PersistenceContext
 	private EntityManager em;
 
-	public boolean addUser(User user) {
-		Query query = em.createQuery("From User u where u.name := name");
-		query.setParameter("name", user.getName());
+	public String addUser(User user) {
+		Query query = em.createQuery("From User u where u.username =:username");
+		query.setParameter("username", user.getUsername());
 		if(query.getResultList().size() > 0) {
-			em.persist(user);
-			return true;
+			return "Username already exists";
 		}
-		else
-			return false;
+		else {
+			em.persist(user);
+			return getJsonUserString(user);
+		}
 	}
 
 	public User getUser(String name) {
@@ -59,13 +62,31 @@ public class JPAUserDAO implements UserDAO {
 		List<User> users = query.getResultList();
 		for(User user : users) {
 			if(user.getUsername().equals(uname)) {
-				if(user.getPassword().equals(pwd))
-					return "Success";
-				else 
+				if(user.getPassword().equals(pwd)) {
+					return getJsonUserString(user);
+				} else 
 					return "Password not correct";
 			}
 		}
 		return "Username not found";
+	}
+	
+	@SuppressWarnings("unchecked")
+	private String getJsonUserString(User user) {
+		JSONObject obj = new JSONObject();
+		obj.put("userId", user.getId());
+		obj.put("username", user.getUsername());
+		obj.put("name", user.getName());
+		return obj.toJSONString();
+	}
+
+	public String updateUser(User user) {
+		User existing = em.find(User.class, user.getId());
+		existing.setName(user.getName());
+		existing.setUsername(user.getUsername());
+		existing.setPassword(user.getPassword());
+		em.merge(existing);
+		return "User updated";
 	}
 
 }

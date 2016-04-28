@@ -7,6 +7,7 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.ws.rs.core.Response;
 
 import com.thomas.lundberg.dao.PlaylistDAO;
 import com.thomas.lundberg.entities.Playlist;
@@ -34,6 +35,22 @@ public class PlaylistServiceEJB implements PlaylistService {
 	public void addSetPlaylists(Collection<Playlist> playlists) {
 		System.out.println("*********** In Playlist Service EJB. Adding collection Playlists ***");
 		playlistDAO.addSetPlaylists(playlists);
+	}
+
+	public Collection<Playlist> getPlaylistsForLib(String libPersistentId) {
+		return playlistDAO.getPlaylistsForLib(libPersistentId);
+	}
+
+	public Collection<Playlist> getTracksForPlaylist(String playlistName) {
+		return playlistDAO.getTracksForPlaylist(playlistName);
+	}
+
+	public Response deletePlaylist(int playlistId) {
+		return playlistDAO.deletePlaylist(playlistId);
+	}
+
+	public Response deleteTrackFromPlaylist(String playlistName, int trackId) {
+		return playlistDAO.deleteTrackFromPlaylist(playlistName, trackId);
 	}
 
 }

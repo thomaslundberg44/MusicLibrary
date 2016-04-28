@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>User Profile</title>
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/profileStyle.css">
+    <script type="text/javascript" src="media/js/jquery.min.js"></script>
+	<script type="text/javascript" src="media/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript">
+		var isLoggedIn = false;
+        isLoggedIn = window.sessionStorage.getItem("loggedIn");
+
+        var username = window.sessionStorage.getItem("username");
+        var userId = parseInt(window.sessionStorage.getItem("userId"));
+        
+        if(!isLoggedIn) {
+            window.location.assign("http://localhost:8080/MusicLibrary");
+        }
+
+        $(document).ready(function() {
+        	// get libraries
+    		$.ajax({
+    			async : false,
+    			type : "POST",
+    			url : "rest/libraries/getLibsForUser",
+    			data : JSON.stringify(userId),
+    			success : function(dataset) {
+    				var table = $("#myTable").dataTable({
+    					data: getTableArray(dataset),
+    					columns: [
+				            { title: "Library Persistent ID" },
+				            { title: "Music Folder"}
+        				]
+    				});
+                    setTableSelector(table);
+    			},
+    			contentType : "application/json"
+    		});
+    		// get user details
+    		$.ajax({
+                async : false,
+                method : "POST",
+                url : "rest/users/getUser",
+                data : JSON.stringify(userId),
+                success : function(data) {
+                    setUserDetails(data);
+                },
+                contentType : "application/json"
+            });
+		});
+
+		function getTableArray(jdata) {
+			var array = [];
+			$.each(jdata, function(index, value) {
+				$.each(value, function (key, val) {
+				    array.push([val[0], val[1]]);
+				});
+			});
+			return array;
+		}
+
+		function setTableSelector(table) {
+            $('#myTable tbody').on( 'click', 'tr', function () {
+                if ( $(this).hasClass('selected') ) {
+                    $(this).removeClass('selected');
+                    document.getElementById('btnDeleteLibrary').style.visibility = "hidden";
+                }
+                else {
+                    table.$('tr.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                    document.getElementById('btnDeleteLibrary').style.visibility = "visible";
+                    selectedCell = $(this).find("td").eq(0);
+                }
+            } );
+
+            $('#btnDeleteLibrary').click( function () {
+            	var libPersistentId = selectedCell.html();
+                alert("Deleting Library: "+libPersistentId);
+                $('#myTable').DataTable().row('.selected').remove().draw( false );
+                document.getElementById('btnDeleteLibrary').style.visibility = "hidden";
+                $.ajax({
+                	async : false,
+                	type : "DELETE",
+                	url : "rest/libraries/deleteLib",
+                	data : libPersistentId,
+                	success : function(data) {
+                		alert("Boom"+data);
+                	},
+                	contentType : "text/plain"
+                });
+            } );
+        }status
+
+        var selectedCell;
+
+		function setUserDetails(user) {
+            $("#name")[0].innerHTML = user.name;
+            $("#username")[0].innerHTML = user.username;
+            $("#pwd")[0].innerHTML = user.password;
+        }
+	</script>
+</head>
+<body>
+
+	<br>
+
+	<div class="container" id="profile-inset-form">
+
+		<div id="logo" align="center">
+			<img id='imgLogo' src="images/android_eat_apple_logo.png" alt="Logo">
+		</div>
+
+		<div class="row">
+			<div class="col-xs-12 col-sm-12 col-md-12">
+				<div class="well well-sm">
+					<div class="row">
+						<div class="col-sm-4 col-md-4" id="details-pane">
+							<h2>Your Personal Details</h2>
+							<p>
+							<i class="glyphicon glyphicon-user"></i><b>Username:&nbsp</b><i id="username"></i> 
+							<br />
+							<i class="glyphicon glyphicon-record"></i><b>Name:&nbsp</b><i id="name"></i> 
+							<br />
+							<i class="glyphicon glyphicon-certificate"></i><b>Password:&nbsp</b><i id="pwd"></i></p>
+							
+						</div>
+
+        				<button class="btn btn-primary pull-right" id="btnDeleteLibrary" style="visibility:hidden">
+        					Delete Selected Library
+        				</button>
+
+						<div class="col-sm-8 col-md-8" id="lib-table-Pane">
+							<h2>Your Librarys</h2>
+							<table id="myTable" class="display" width="100%" cellspacing="0" >
+								<thead>
+									<tr>
+										<th>Library Persistent ID</th>
+										<th>Music Folder</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>

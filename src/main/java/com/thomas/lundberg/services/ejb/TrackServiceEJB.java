@@ -7,6 +7,7 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.ws.rs.core.Response;
 
 import com.thomas.lundberg.dao.TrackDAO;
 import com.thomas.lundberg.entities.Track;
@@ -34,6 +35,10 @@ public class TrackServiceEJB implements TrackService {
 	public Collection<Track> getAllTracks() {
 		System.out.println("********* In Track Service EJB. Adding Collection Track *********");
 		return trackDAO.getAllTracks();
+	}
+
+	public Response deleteTrack(int trackId, String playlistName) {
+		return trackDAO.deleteTrack(trackId, playlistName);
 	}
 
 }

@@ -1,16 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8">
-	<title>Register</title>
-
+<meta charset="UTF-8">
+<title>Update User Details</title>
+	
 	<link rel="stylesheet" type="text/css" href="css/formStyle.css">
 	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
 	<script type="text/javascript" src="media/js/jquery.min.js"></script>
 	<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
-
+	
 	<script type="text/javascript">
-		$(document).ready(function() {
+		var isLoggedIn = false;
+        isLoggedIn = window.sessionStorage.getItem("loggedIn");
+        
+        if(!isLoggedIn) {
+            window.location.assign("http://localhost:8080/MusicLibrary");
+        }
+
+        var userId = parseInt(window.sessionStorage.getItem("userId"));
+
+        $(document).ready(function() {
+
+        	// get user details
+    		$.ajax({
+                async : false,
+                method : "POST",
+                url : "rest/users/getUser",
+                data : JSON.stringify(userId),
+                success : function(data) {
+                    setUserDetails(data);
+                },
+                contentType : "application/json"
+            });
+
 			$("#register").submit(function() {
 				var username = $("#uname")[0].value;
 				var name = $("#name")[0].value;
@@ -26,6 +48,7 @@
 					alert("Passwords must be the same!");
 				} else {
 					var user = {
+						"userId" : userId+"",
 						"username" : username,
 						"name" : name,
 						"password" : pwd1
@@ -33,18 +56,10 @@
 					$.ajax({
 						async : false,
 						type : "POST",
-						url : "rest/users/create",
+						url : "rest/users/update",
 						data : JSON.stringify(user),
 						success : function(data) {
-							if(data.indexOf("username") >= 0) {
-								var userDetails = JSON.parse(data);
-								alert("User created - logging in as "+username);
-								window.sessionStorage.setItem("userId", userDetails.userId);
-								window.sessionStorage.setItem("loggedIn", true);
-								window.location.assign("http://localhost:8080/MusicLibrary/userProfile.html");
-							}else {
-								alert(data);
-							}
+							alert(data);
 						},
 						contentType : "application/json"
 					});
@@ -53,8 +68,13 @@
 			});
 		});
 
+		function setUserDetails(user) {
+            $("#name")[0].value = user.name;
+            $("#uname")[0].value = user.username;
+            $("#pwd1")[0].value = user.password;
+            $("#pwd2")[0].value = user.password;
+        }
 	</script>
-
 </head>
 <body>
 
@@ -65,7 +85,7 @@
 			<div id="logo" align="center">
 				<img id='imgLogo' src="images/android_eat_apple_logo.png" alt="Logo">
 			</div>
-			<h2 align="center">Register</h2>
+			<h2 align="center">Edit User Details</h2>
 			<form class="form-horizontal" role="form" id="register">
 				<div class="form-group">
 					<label class="control-label col-sm-2" for="username">Username:</label>
@@ -91,19 +111,14 @@
 						<input type="password" class="form-control" id="pwd2" placeholder="Re-enter password">
 					</div>
 				</div>
-				<!-- <div class="form-group">
-					<label class="control-label col-sm-2">Choose File</label>
-					<div class="col-sm-10">
-						<input id="formInput" type="file" name="uploadedFile" size="50" accept=".xml" />
-					</div>
-				</div> -->
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
-						<button type="submit" class="btn btn-primary btn-block">Register</button>
+						<button type="submit" class="btn btn-primary btn-block">Update</button>
 					</div>
 				</div>
 			</form>
 		</div>
 	</div>
+
 </body>
 </html>

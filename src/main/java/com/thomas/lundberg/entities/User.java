@@ -1,6 +1,7 @@
 package com.thomas.lundberg.entities;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -12,6 +13,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name="Users")
@@ -29,8 +32,8 @@ public class User implements Serializable {
 	@Column(name="password") private String password;
 	
 	// relationship to library table through library persistent id
-	@OneToMany(mappedBy="user", fetch = FetchType.EAGER, cascade={CascadeType.MERGE, CascadeType.PERSIST})
-	private Set<Library> libraries;
+	@OneToMany(fetch=FetchType.LAZY, mappedBy="user", cascade=CascadeType.ALL)
+	private Set<Library> libraries= new HashSet<Library>();
 	
 	public User() {}
 	
@@ -72,7 +75,8 @@ public class User implements Serializable {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
+	
+	@JsonIgnore
 	public Set<Library> getLibraries() {
 		return libraries;
 	}
