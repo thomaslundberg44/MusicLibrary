@@ -146,6 +146,7 @@
                 if ( $(this).hasClass('selected') ) {
                     $(this).removeClass('selected');
                     document.getElementById('btnDeleteTrack').style.visibility = "hidden";
+                    document.getElementById("moveTrackForm").style.visibility = "hidden";
                 }
                 else {
                     table.$('tr.selected').removeClass('selected');
@@ -213,7 +214,7 @@
         }
 
         function moveTrack() {
-            alert("Moving track: "+selectedCell.html());
+            // alert("Moving track: "+selectedCell.html());
             // selectedCell = null;
             if(selectedLibrary == "")
                 alert("Please select a Playlist from drop down menus");
